@@ -1,0 +1,151 @@
+@import './fonts';
+
+@import './globals';
+
+.header {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+
+  .tile {
+    background-color: #b8eeee;
+    display: flex;
+    margin: 0 0 0.25rem 0;
+    padding: 1.25rem;
+
+    &__img {
+      align-items: center;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      justify-content: center;
+      margin: 0 1rem 0 0;
+      width: 1.5rem;
+    }
+
+    &__details {
+      h4 {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.footer {
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+
+  .btn {
+    &--cta {
+      background-color: #4ad17a;
+      border-radius: 0;
+      width: 100%;
+
+      .btn__icon {
+        aspect-ratio: 1 / 1;
+        font-size: 1rem;
+        margin: 0 0.5rem 0 0;
+        width: 1.75rem;
+      }
+    }    
+  }
+}
+
+.modal {
+  padding: 1rem;
+
+  legend {
+    margin: 0 0 0 0.5rem;
+    padding: 0.5rem 0.5rem 0;
+  }
+
+  form {
+    padding: 1rem;
+
+    .form-group {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      padding: 0.5rem 0;
+
+      &__title {
+        margin: 0 0.5rem 0 0;
+      }
+
+      &--one {
+        margin: 0 0.5rem 0 0 ;
+      }
+
+      &--two {
+        margin: 0 0 0 0.5rem ;
+      }
+    }
+
+    .wrap {
+      &--select,
+      &--input {
+        border: 1px solid #555;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+      }
+
+      &--select {
+        &::after {
+          content: "◢";
+          position: absolute;
+          right: 0.75rem;
+          top: 50%;
+          transform: translateY(-60%) rotate(45deg);
+        }
+      }
+
+      &--btn {
+        .form-group {
+          width: 50%;
+        }
+      }
+
+      &--courses {
+        flex-direction: column;
+        margin: 1.5rem 0;
+      }
+    }
+
+    .btn {
+      width: 100%;
+
+      &--calc {
+        background-color: #b8eeee;
+      }
+    }
+
+    .grade {
+      background-color: #b8eeee41;
+      display: flex;
+      padding: 0.5rem;
+
+      .form-group {
+        input {
+          padding: 0.25rem;
+        }
+        &--one {
+          width: 60%;
+        }
+      }
+    }
+  }
+
+  .wrap {
+    align-items: center;
+    display: flex;
+  }
+}

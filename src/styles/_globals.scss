@@ -1,0 +1,48 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: #343434;
+  font-family: 'Quicksand', serif;
+  padding: 0 0 4rem;
+}
+
+h2,
+h3,
+h4 {
+  font-family: 'Cabinet Grotesk', sans-serif;
+}
+
+b {
+  font-weight: 600;
+}
+
+.btn {
+  align-items: center;
+  appearance: none;
+  background-color: #ededed;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  justify-content: center;
+  padding: 1rem;
+  outline-color: #555;
+}
+
+input,
+select {
+  appearance: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  outline-color: #555;
+  padding: 0.5rem;
+  width: 100%;
+}
