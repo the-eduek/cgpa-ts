@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧮</text></svg>" />
     <title>cgpa calculator</title>
+    <script src="./src/main.ts" type="module"></script>
   </head>
 
   <body>
-    <main>
-      <section class="header">
+    <main class="main" data-main>
+      <section class="main__header">
         <h2>cgpa calculator</h2>
       </section>
 
-      <section class="main">
+      <section class="main__content">
         <div class="tile">
           <div class="tile__img">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -54,8 +55,8 @@
         </div>
       </section>
 
-      <section class="footer">
-        <button class="btn btn--cta" type="button">
+      <section class="main__footer">
+        <button class="btn btn--cta" type="button" data-btn-semester>
           <span class="btn__icon">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -64,95 +65,82 @@
           <span>add semester</span>
         </button>
       </section>
+    </main>
 
-      <section class="modal modal--form">
-        <fieldset>
-          <legend>semester information</legend>
+    <section class="modal" data-modal>
+      <div class="wrap wrap--form" data-modal-wrap>
+        <form data-grade-form>
+          <div class="form-group">
+            <h3>grades</h3>
 
-          <form>
-            <div class="form-group">
-              <h4 class="form-group__title">part</h4>
+            <button class="btn btn--close" type="button" title="close form" data-btn-close>
+              <span class="btn__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </span>
+            </button>
+          </div>
+          <div class="form-group">
+            <h4 class="form-group__title">part</h4>
 
-              <div class="wrap wrap--select">
-                <select name="part" id="part">
-                  <option value="I">1</option>
-                  <option value="II">2</option>
-                  <option value="III">3</option>
-                  <option value="IV">4</option>
-                  <option value="V">5</option>
-                  <option value="VI">6</option>
-                  <option value="VII">7</option>
-                </select>
-              </div>
+            <div class="wrap wrap--select">
+              <select name="part" id="part">
+                <option value="I">1</option>
+                <option value="II">2</option>
+                <option value="III">3</option>
+                <option value="IV">4</option>
+                <option value="V">5</option>
+                <option value="VI">6</option>
+                <option value="VII">7</option>
+              </select>
             </div>
+          </div>
 
-            <div class="form-group">
-              <h4 class="form-group__title">semester</h4>
+          <div class="form-group">
+            <h4 class="form-group__title">semester</h4>
 
-              <div class="wrap wrap--select">
-                <select name="semester" id="semester">
-                  <option value="harmattan">first</option>
-                  <option value="rain">second</option>
-                </select>
-              </div>
+            <div class="wrap wrap--select">
+              <select name="semester" id="semester">
+                <option value="harmattan">first</option>
+                <option value="rain">second</option>
+              </select>
             </div>
+          </div>
 
-            <div class="wrap wrap--courses" data-courseList>
-              <div class="grade">
-                <div class="form-group form-group--one">
-                  <h4 class="form-group__title">course:</h4>
-
-                  <div class="wrap wrap--input">
-                    <input type="text" name="courseTitle">
-                  </div>
-                </div>
-
-                <div class="form-group form-group--two">
-                  <h4 class="form-group__title">score:</h4>
-  
-                  <div class="wrap wrap--input">
-                    <input type="number" min="0" max="100" name="courseScore">
-                  </div>
-                </div>
-              </div>
-
-              <div class="grade">
-                <div class="form-group form-group--one">
-                  <h4 class="form-group__title">course:</h4>
-
-                  <div class="wrap wrap--input">
-                    <input type="text" name="courseTitle">
-                  </div>
-                </div>
-
-                <div class="form-group form-group--two">
-                  <h4 class="form-group__title">score:</h4>
-  
-                  <div class="wrap wrap--input">
-                    <input type="number" min="0" max="100" name="courseScore">
-                  </div>
-                </div>
-              </div>
-
-              
-            </div>
-              
-            </div>
-
-            <div class="wrap wrap--btn">
+          <div class="wrap wrap--courses" data-course-list>
+            <div class="grade">
               <div class="form-group form-group--one">
-                <button class="btn" type="button">add grades</button>
+                <h4 class="form-group__title">course:</h4>
+
+                <div class="wrap wrap--input">
+                  <input type="text" name="courseTitle">
+                </div>
               </div>
 
               <div class="form-group form-group--two">
-                <button class="btn btn--calc" type="submit">calculate</button>
+                <h4 class="form-group__title">score:</h4>
+
+                <div class="wrap wrap--input">
+                  <input type="number" min="0" max="100" name="courseScore">
+                </div>
               </div>
-            </div>            
-          </form>
-        </fieldset>
-       
-      </section>
-    </main>
-    <script type="module" src="/src/main.ts"></script>
+            </div>
+
+            
+          </div>
+
+          <div class="wrap wrap--btn">
+            <div class="form-group form-group--one">
+              <button class="btn" type="button" data-btn-grade>add grade</button>
+            </div>
+
+            <div class="form-group form-group--two">
+              <button class="btn btn--calc" type="submit">calculate</button>
+            </div>
+          </div>            
+        </form>
+      </div>
+    </section>
   </body>
 </html>

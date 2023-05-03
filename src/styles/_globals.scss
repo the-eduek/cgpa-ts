@@ -7,7 +7,6 @@
 body {
   color: #343434;
   font-family: 'Quicksand', serif;
-  padding: 0 0 4rem;
 }
 
 h2,
@@ -42,7 +41,13 @@ select {
   border: none;
   font-family: inherit;
   font-size: inherit;
+  height: 100%;
   outline-color: #555;
-  padding: 0.5rem;
+  padding: 0.25rem;
   width: 100%;
+}
+
+.wrap {
+  align-items: center;
+  display: flex;
 }
