@@ -80,8 +80,7 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 
   let semesterParamsTuple: [string, 'harmattan' | 'rain', number, Array<Grade>];
   semesterParamsTuple = [partSelect.value, <'harmattan' | 'rain'>semesterSelect.value, gpa, gradesList];
-  const semesterObj = new Semester(...semesterParamsTuple)
-  addSemesterInfo(semesterObj);
+  const semesterObj = new Semester(...semesterParamsTuple);
 
   // save semester information to local storage
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("grades") || '[]');
@@ -101,11 +100,11 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
   const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
 
   let hons: string;
-  if (gpa > 4.5) hons = "first class";
-  else if (gpa > 3.49 && gpa < 4.5) hons = "second class upper";
-  else if (gpa > 2.39 && gpa < 3.5) hons = "second class lower";
-  else if (gpa > 1.49 && gpa < 2.4) hons = "third class";
-  else if (gpa > 0.9 && gpa < 1.5) hons = "pass";
+  if (cgpa > 4.5) hons = "first class 🏆";
+  else if (cgpa > 3.49 && cgpa < 4.5) hons = "second class upper 💪🏾";
+  else if (cgpa > 2.39 && cgpa < 3.5) hons = "second class lower 🤞🏾";
+  else if (cgpa > 1.49 && cgpa < 2.4) hons = "third class 😬";
+  else if (cgpa > 0.9 && cgpa < 1.5) hons = "pass 🤡";
   else hons = "no way 💀💀";
 
   studentProfile.cgpa = cgpa;
@@ -114,13 +113,17 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 
   // close the modal
   toggleVisible();
+
+  // update page with new content
+  mainContentEl.innerHTML = "";
+  displayContent();
 });
 
 
-/** adding new sememster grade */
+/** displaying semesters tiles  */
 const mainContentEl = document.querySelector<HTMLDivElement>('[data-main-content]')!;
 
-function addSemesterInfo(semesterArg: Semester): void {
+function displaySemesterInfo(semesterArg: Semester): void {
   // create tile element
   const tileEl = document.createElement('div');
   tileEl.classList.add('tile');
@@ -134,10 +137,9 @@ function addSemesterInfo(semesterArg: Semester): void {
     <div class="tile__details">
       <h4>part ${semesterArg.part.toUpperCase()}, ${semesterArg.semester} semester</h4>
       <p>GPA: ${semesterArg.gpa.toFixed(2)}</p>
-      <p>honours: ${semesterArg.honours}</p>
     </div>
   `;
-  mainContentEl.appendChild(tileEl);  
+  mainContentEl.appendChild(tileEl);
 };
 
 
@@ -166,3 +168,33 @@ modalContentEl.addEventListener("click", (e: Event) => {
 
 // open/close modal with the close button
 closeModalBtn.addEventListener("click", toggleVisible);
+
+
+/** kickstarting the app with available data */
+document.addEventListener("DOMContentLoaded", displayContent);
+
+function displayContent() {
+  // create student tile element
+  const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
+
+  const tileEl = document.createElement('div');
+  tileEl.classList.add('tile');
+  tileEl.innerHTML = `
+    <div class="tile__img">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>            
+    </div>
+
+    <div class="tile__details">
+      <h3>student</h3>
+      <p>cummulative GPA: <b>${studentProfile?.cgpa?.toFixed(2) ?? '0.00' }</b></p>
+      <p>honours: <b>${studentProfile?.honours ?? '---' }</b></p>
+    </div>
+  `;
+  mainContentEl.appendChild(tileEl);
+
+  // rest of semester tiles
+  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("grades") || '[]');
+  allSemesters.forEach(semester => displaySemesterInfo(semester))
+}
