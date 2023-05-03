@@ -14,7 +14,7 @@
         <h2>cgpa calculator</h2>
       </section>
 
-      <section class="main__content">
+      <section class="main__content" data-main-content>
         <div class="tile">
           <div class="tile__img">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -25,6 +25,7 @@
           <div class="tile__details">
             <h3>student</h3>
             <p>cummulative GPA: <b>0.00</b></p>
+            <p>honours: <b>first class</b></p>
           </div>
         </div>
 
@@ -38,6 +39,7 @@
           <div class="tile__details">
             <h4>part 1, harmattan semester</h4>
             <p>GPA: 0.00</p>
+            <p>honours: first class</p>
           </div>
         </div>
 
@@ -51,6 +53,7 @@
           <div class="tile__details">
             <h4>part 1, rain semester</h4>
             <p>GPA: 0.00</p>
+            <p>honours: first class</p>
           </div>
         </div>
       </section>
@@ -81,11 +84,12 @@
               </span>
             </button>
           </div>
+
           <div class="form-group">
             <h4 class="form-group__title">part</h4>
 
             <div class="wrap wrap--select">
-              <select name="part" id="part">
+              <select data-part>
                 <option value="I">1</option>
                 <option value="II">2</option>
                 <option value="III">3</option>
@@ -101,7 +105,7 @@
             <h4 class="form-group__title">semester</h4>
 
             <div class="wrap wrap--select">
-              <select name="semester" id="semester">
+              <select data-semester>
                 <option value="harmattan">first</option>
                 <option value="rain">second</option>
               </select>
@@ -110,24 +114,7 @@
 
           <div class="wrap wrap--courses" data-course-list>
             <div class="grade">
-              <div class="form-group form-group--one">
-                <h4 class="form-group__title">course:</h4>
-
-                <div class="wrap wrap--input">
-                  <input type="text" name="courseTitle">
-                </div>
-              </div>
-
-              <div class="form-group form-group--two">
-                <h4 class="form-group__title">score:</h4>
-
-                <div class="wrap wrap--input">
-                  <input type="number" min="0" max="100" name="courseScore">
-                </div>
-              </div>
             </div>
-
-            
           </div>
 
           <div class="wrap wrap--btn">
