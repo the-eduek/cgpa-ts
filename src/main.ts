@@ -88,6 +88,30 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
   allSemesters.push(semesterObj);
   localStorage.setItem("grades", JSON.stringify(allSemesters));
 
+  // calculate cummulative gpa
+  const cummulativeUnits = allSemesters.map(semesterItem => semesterItem.grades.map(grade => grade.unit)).flat();
+  const cummulativeGradePoints = allSemesters.map(semesterItem => semesterItem.grades.map(grade => {
+    let gradeProperties = <[ string, number, number ]>Object.values(grade);
+    let placeholderGradeObj = new Grade(...gradeProperties);
+    return placeholderGradeObj.gradeTotal;
+  })).flat();
+  const cgpa = calculateGPA(cummulativeGradePoints, cummulativeUnits);
+
+  // save cummulative student information to local storage
+  const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
+
+  let hons: string;
+  if (gpa > 4.5) hons = "first class";
+  else if (gpa > 3.49 && gpa < 4.5) hons = "second class upper";
+  else if (gpa > 2.39 && gpa < 3.5) hons = "second class lower";
+  else if (gpa > 1.49 && gpa < 2.4) hons = "third class";
+  else if (gpa > 0.9 && gpa < 1.5) hons = "pass";
+  else hons = "no way 💀💀";
+
+  studentProfile.cgpa = cgpa;
+  studentProfile.honours = hons;
+  localStorage.setItem("student", JSON.stringify(studentProfile));
+
   // close the modal
   toggleVisible();
 });
@@ -97,7 +121,7 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 const mainContentEl = document.querySelector<HTMLDivElement>('[data-main-content]')!;
 
 function addSemesterInfo(semesterArg: Semester): void {
-    // create tile element
+  // create tile element
   const tileEl = document.createElement('div');
   tileEl.classList.add('tile');
   tileEl.innerHTML = `
@@ -123,7 +147,7 @@ const closeModalBtn = document.querySelector<HTMLButtonElement>("[data-btn-close
 const mainEl = document.querySelector<HTMLDivElement>("[data-main]")!;
 const modalContentEl = document.querySelector<HTMLDivElement>("[data-modal]")!;
 
-  // toggle open/close classe on modal 
+// toggle open/close classe on modal 
 function toggleVisible(): void {
   mainEl.classList.toggle('main--blur');
   modalContentEl.classList.toggle('modal--visible');
@@ -132,13 +156,13 @@ function toggleVisible(): void {
   courseListElement.innerHTML = `<div class="grade">${gradeHtml}</div`;
 };
 
-  // open modal
+// open modal
 semesterBtn.addEventListener("click", toggleVisible);
 
-  // close modal
+// close modal
 modalContentEl.addEventListener("click", (e: Event) => {
   if (e.target === e.currentTarget) toggleVisible();
 });
 
-  // open/close modal with the close button
+// open/close modal with the close button
 closeModalBtn.addEventListener("click", toggleVisible);
