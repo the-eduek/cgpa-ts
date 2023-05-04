@@ -64,52 +64,60 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
   const unitsList = [...document.querySelectorAll<HTMLInputElement>("[data-unit]")].map(input => input.valueAsNumber);
   const scoresList = [...document.querySelectorAll<HTMLInputElement>("[data-score]")].map(input => input.valueAsNumber);
 
-  // calculate gpa
-  const gradesList: Array<Grade> = [];
-  coursesList.forEach((course, index) => {
-    let gradeParamsTuple: [string, number, number];
-    gradeParamsTuple = [course.toLowerCase(), unitsList[index], scoresList[index]];
-
-    let gradeObj = new Grade(...gradeParamsTuple);
-    gradesList.push(gradeObj);
-  });
-
-  // create semester information
-  const totalGradePoints = gradesList.map(grade => grade.gradeTotal);
-  const gpa = calculateGPA(totalGradePoints, unitsList);
-
-  let semesterParamsTuple: [string, 'harmattan' | 'rain', number, Array<Grade>];
-  semesterParamsTuple = [partSelect.value, <'harmattan' | 'rain'>semesterSelect.value, gpa, gradesList];
-  const semesterObj = new Semester(...semesterParamsTuple);
-
-  // save semester information to local storage
+  // check if there's already grade information existing for the same part and semester
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("grades") || '[]');
-  allSemesters.push(semesterObj);
-  localStorage.setItem("grades", JSON.stringify(allSemesters));
+  const semesterAlreadyExists = allSemesters.some(semesterItem => semesterItem.part === partSelect.value && semesterItem.semester === semesterSelect.value);
 
-  // calculate cummulative gpa
-  const cummulativeUnits = allSemesters.map(semesterItem => semesterItem.grades.map(grade => grade.unit)).flat();
-  const cummulativeGradePoints = allSemesters.map(semesterItem => semesterItem.grades.map(grade => {
-    let gradeProperties = <[ string, number, number ]>Object.values(grade);
-    let placeholderGradeObj = new Grade(...gradeProperties);
-    return placeholderGradeObj.gradeTotal;
-  })).flat();
-  const cgpa = calculateGPA(cummulativeGradePoints, cummulativeUnits);
+  if (!semesterAlreadyExists) {
+    // calculate gpa
+    const gradesList: Array<Grade> = [];
+    coursesList.forEach((course, index) => {
+      let gradeParamsTuple: [string, number, number];
+      gradeParamsTuple = [course.toLowerCase(), unitsList[index], scoresList[index]];
 
-  // save cummulative student information to local storage
-  const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
+      let gradeObj = new Grade(...gradeParamsTuple);
+      gradesList.push(gradeObj);
+    });
 
-  let hons: string;
-  if (cgpa > 4.5) hons = "first class 🏆";
-  else if (cgpa > 3.49 && cgpa < 4.5) hons = "second class upper 💪🏾";
-  else if (cgpa > 2.39 && cgpa < 3.5) hons = "second class lower 🤞🏾";
-  else if (cgpa > 1.49 && cgpa < 2.4) hons = "third class 😬";
-  else if (cgpa > 0.9 && cgpa < 1.5) hons = "pass 🤡";
-  else hons = "no way 💀💀";
+    // create semester object
+    const totalGradePoints = gradesList.map(grade => grade.gradeTotal);
+    const gpa = calculateGPA(totalGradePoints, unitsList);
 
-  studentProfile.cgpa = cgpa;
-  studentProfile.honours = hons;
-  localStorage.setItem("student", JSON.stringify(studentProfile));
+    let semesterParamsTuple: [string, 'harmattan' | 'rain', number, Array<Grade>];
+    semesterParamsTuple = [partSelect.value, <'harmattan' | 'rain'>semesterSelect.value, gpa, gradesList];
+    const semesterObj = new Semester(...semesterParamsTuple);
+
+    // save semester object to local storage
+    allSemesters.push(semesterObj);
+    localStorage.setItem("grades", JSON.stringify(allSemesters));
+
+    // calculate cummulative gpa
+    const cummulativeUnits = allSemesters.map(semesterItem => semesterItem.grades.map(grade => grade.unit)).flat();
+    const cummulativeGradePoints = allSemesters.map(semesterItem => semesterItem.grades.map(grade => {
+      let gradeProperties = <[ string, number, number ]>Object.values(grade);
+      let placeholderGradeObj = new Grade(...gradeProperties);
+      return placeholderGradeObj.gradeTotal;
+    })).flat();
+    const cgpa = calculateGPA(cummulativeGradePoints, cummulativeUnits);
+
+    // save cummulative student information to local storage
+    const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
+
+    let hons: string;
+    if (cgpa > 4.5) hons = "first class 🏆";
+    else if (cgpa > 3.49 && cgpa < 4.5) hons = "second class upper 💪🏾";
+    else if (cgpa > 2.39 && cgpa < 3.5) hons = "second class lower 🤞🏾";
+    else if (cgpa > 1.49 && cgpa < 2.4) hons = "third class 😬";
+    else if (cgpa > 0.9 && cgpa < 1.5) hons = "pass 🤡";
+    else hons = "no way 💀💀";
+
+    studentProfile.cgpa = cgpa;
+    studentProfile.honours = hons;
+    localStorage.setItem("student", JSON.stringify(studentProfile));
+  } else {
+    /** @todo: display some kind of warning on the ui that semester already exists */
+    console.log(`there's already information for part ${partSelect.value}, ${semesterSelect.value} semester.`)
+  };
 
   // close the modal
   toggleVisible();
@@ -173,8 +181,8 @@ closeModalBtn.addEventListener("click", toggleVisible);
 /** kickstarting the app with available data */
 document.addEventListener("DOMContentLoaded", displayContent);
 
-function displayContent() {
-  // create student tile element
+function displayContent(): void {
+  // create and sdisplay student tile element
   const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
 
   const tileEl = document.createElement('div');
@@ -194,7 +202,7 @@ function displayContent() {
   `;
   mainContentEl.appendChild(tileEl);
 
-  // rest of semester tiles
+  // display semester tiles
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("grades") || '[]');
   allSemesters.forEach(semester => displaySemesterInfo(semester))
-}
+};
