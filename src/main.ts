@@ -92,7 +92,7 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
     localStorage.setItem("semesters", JSON.stringify(allSemesters));
 
     // calculate cummulative gpa and set student object
-    setStudent();
+    setStudentDetails();
   } else {
     /** @todo: display some kind of warning on the ui that semester already exists */
     console.log(`there's already information for part ${partSelect.value}, ${semesterSelect.value} semester.`)
@@ -107,7 +107,7 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 
 
 /** get student info, calculate cummulative gpa */
-function setStudent(): void {
+function setStudentDetails(): void {
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
   const gradesList = allSemesters.map(semester => semester.grades);
 
@@ -248,10 +248,14 @@ document.addEventListener("DOMContentLoaded", displayMainContent);
 function displayMainContent(): void {
   // empty page first
   mainContentEl.innerHTML = "";
-  setStudent();
 
   // create and display student tile element
-  const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
+  let studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student")!);
+  
+  if (!studentProfile) {
+    setStudentDetails();
+    studentProfile = JSON.parse(localStorage.getItem("student")!);
+  };
 
   const tileEl = document.createElement('div');  
   tileEl.className = "tile";
@@ -274,12 +278,12 @@ function displayMainContent(): void {
   const tileCgpaEl = document.createElement('p');
   const tileCgpaTextEl = document.createElement('b');
   tileCgpaTextEl.innerText = `${studentProfile.cgpa?.toFixed(2) ?? '0.00'}`
-  tileCgpaEl.innerText = `cummulative GPA: ${tileCgpaTextEl.innerText}`;
+  tileCgpaEl.innerHTML = `cummulative GPA: ${tileCgpaTextEl.outerHTML}`;
 
   const tileHonsEl = document.createElement('p');
   const tileHonsTextEl = document.createElement('b');
   tileHonsTextEl.innerText = `${studentProfile.honours}`
-  tileHonsEl.innerText = `honours: ${tileHonsTextEl.innerText}`;
+  tileHonsEl.innerHTML = `honours: ${tileHonsTextEl.outerHTML}`;
 
   tileDetailsEl.append(tileDetailsTitleEl);
   tileDetailsEl.append(tileCgpaEl);
