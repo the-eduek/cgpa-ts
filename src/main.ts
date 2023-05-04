@@ -42,7 +42,7 @@ addGradeBtn.addEventListener("click", () => {
 });
 
 
-/** calcuate gpa */
+/** calculate gpa */
 const gradeForm = document.querySelector<HTMLFormElement>("[data-grade-form]")!;
 const partSelect = document.querySelector<HTMLSelectElement>("[data-part]")!;
 const semesterSelect = document.querySelector<HTMLSelectElement>("[data-semester]")!;
@@ -65,7 +65,7 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
   const scoresList = [...document.querySelectorAll<HTMLInputElement>("[data-score]")].map(input => input.valueAsNumber);
 
   // check if there's already grade information existing for the same part and semester
-  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("grades") || '[]');
+  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
   const semesterAlreadyExists = allSemesters.some(semesterItem => semesterItem.part === partSelect.value && semesterItem.semester === semesterSelect.value);
 
   if (!semesterAlreadyExists) {
@@ -89,31 +89,10 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 
     // save semester object to local storage
     allSemesters.push(semesterObj);
-    localStorage.setItem("grades", JSON.stringify(allSemesters));
+    localStorage.setItem("semesters", JSON.stringify(allSemesters));
 
-    // calculate cummulative gpa
-    const cummulativeUnits = allSemesters.map(semesterItem => semesterItem.grades.map(grade => grade.unit)).flat();
-    const cummulativeGradePoints = allSemesters.map(semesterItem => semesterItem.grades.map(grade => {
-      let gradeProperties = <[ string, number, number ]>Object.values(grade);
-      let placeholderGradeObj = new Grade(...gradeProperties);
-      return placeholderGradeObj.gradeTotal;
-    })).flat();
-    const cgpa = calculateGPA(cummulativeGradePoints, cummulativeUnits);
-
-    // save cummulative student information to local storage
-    const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
-
-    let hons: string;
-    if (cgpa > 4.5) hons = "first class 🏆";
-    else if (cgpa > 3.49 && cgpa < 4.5) hons = "second class upper 💪🏾";
-    else if (cgpa > 2.39 && cgpa < 3.5) hons = "second class lower 🤞🏾";
-    else if (cgpa > 1.49 && cgpa < 2.4) hons = "third class 😬";
-    else if (cgpa > 0.9 && cgpa < 1.5) hons = "pass 🤡";
-    else hons = "no way 💀💀";
-
-    studentProfile.cgpa = cgpa;
-    studentProfile.honours = hons;
-    localStorage.setItem("student", JSON.stringify(studentProfile));
+    // calculate cummulative gpa and set student object
+    setStudent();
   } else {
     /** @todo: display some kind of warning on the ui that semester already exists */
     console.log(`there's already information for part ${partSelect.value}, ${semesterSelect.value} semester.`)
@@ -123,30 +102,115 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
   toggleVisible();
 
   // update page with new content
-  mainContentEl.innerHTML = "";
-  displayContent();
+  displayMainContent();
 });
 
 
-/** displaying semesters tiles  */
+/** get student info, calculate cummulative gpa */
+function setStudent(): void {
+  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
+  const gradesList = allSemesters.map(semester => semester.grades);
+
+  let cummulativeGradePoints: Array<number> = [];
+  let cummulativeUnits: Array<number> = [];
+
+  gradesList.forEach(gradeArray => {
+    let semesterGradesList: Array<Grade> = [];
+
+    gradeArray.forEach(grade => {
+      let gradeParamsTuple: [string, number, number];
+      gradeParamsTuple = [grade.course, grade.unit, grade.score];
+  
+      let gradeObj = new Grade(...gradeParamsTuple);
+      semesterGradesList.push(gradeObj);
+    });
+
+    cummulativeGradePoints.push(...semesterGradesList.map(gr => gr.gradeTotal));
+    cummulativeUnits.push(...semesterGradesList.map(gr => gr.unit));
+  });
+  
+  const cgpa = calculateGPA(cummulativeGradePoints, cummulativeUnits);
+
+  // save cummulative information to local storage  
+  const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
+
+  let hons: string;
+
+  if (cgpa > 4.5) hons = "first class 🏆";
+  else if (cgpa > 3.49 && cgpa < 4.5) hons = "second class upper 💪🏾";
+  else if (cgpa > 2.39 && cgpa < 3.5) hons = "second class lower 🤞🏾";
+  else if (cgpa > 1.49 && cgpa < 2.4) hons = "third class 😬";
+  else if (cgpa > 0.9 && cgpa < 1.5) hons = "pass 🤡";
+  else hons = "no way 💀💀";
+
+  studentProfile.cgpa = cgpa;
+  studentProfile.honours = hons;
+  localStorage.setItem("student", JSON.stringify(studentProfile));
+};
+
+
+/** displaying semester tiles  */
 const mainContentEl = document.querySelector<HTMLDivElement>('[data-main-content]')!;
 
 function displaySemesterInfo(semesterArg: Semester): void {
-  // create tile element
-  const tileEl = document.createElement('div');
-  tileEl.classList.add('tile');
-  tileEl.innerHTML = `
-    <div class="tile__img">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-      </svg>
-    </div>
+  // create and display tile element
+  const tileEl = document.createElement('div');  
+  tileEl.className = "tile";
 
-    <div class="tile__details">
-      <h4>part ${semesterArg.part.toUpperCase()}, ${semesterArg.semester} semester</h4>
-      <p>GPA: ${semesterArg.gpa.toFixed(2)}</p>
-    </div>
+  const tileImgEl = document.createElement('div');
+  const tileIconSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+    </svg>
   `;
+  tileImgEl.className = "tile__img";
+  tileImgEl.innerHTML = tileIconSvg;
+
+  const tileDetailsEl = document.createElement('div');
+  tileDetailsEl.className = "tile__details";
+  const tileDetailsWrapEl = document.createElement('div');
+ 
+  const tileBtnWrapEl = document.createElement('div');
+  tileBtnWrapEl.className = "tile__btn";
+
+  const tileBtnEl = document.createElement('button');
+  tileBtnEl.classList.add("btn");
+  tileBtnEl.classList.add("btn--close");
+  tileBtnEl.type = "button";
+
+  const tileBtnTextEl = document.createElement('span');
+  tileBtnTextEl.innerText = "delete";
+
+  const tileBtnIconEl = document.createElement('span');
+  const tileBtnIconSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  `;
+  tileBtnIconEl.className = "btn__icon";
+  tileBtnIconEl.innerHTML = tileBtnIconSvg;
+
+  const tileSemesterEl = document.createElement('h4');
+  tileSemesterEl.innerText = `part ${semesterArg.part.toUpperCase()}, ${semesterArg.semester} semester`;
+
+  const tileGpaEl = document.createElement('p');
+  tileGpaEl.innerText = `GPA: ${semesterArg.gpa.toFixed(2)}`;
+
+  tileBtnEl.append(tileBtnTextEl);
+  tileBtnEl.append(tileBtnIconEl);
+  tileBtnWrapEl.append(tileBtnEl);
+  tileDetailsWrapEl.append(tileSemesterEl);
+  tileDetailsWrapEl.append(tileBtnWrapEl);
+  tileDetailsEl.append(tileDetailsWrapEl);
+  tileDetailsEl.append(tileGpaEl);
+  tileEl.append(tileImgEl);
+  tileEl.append(tileDetailsEl);
+
+  // add delete functionality to the clear button;
+  tileBtnEl.addEventListener("click", () => {
+    deleteSemester(semesterArg);
+  });
+
   mainContentEl.appendChild(tileEl);
 };
 
@@ -179,30 +243,72 @@ closeModalBtn.addEventListener("click", toggleVisible);
 
 
 /** kickstarting the app with available data */
-document.addEventListener("DOMContentLoaded", displayContent);
+document.addEventListener("DOMContentLoaded", displayMainContent);
 
-function displayContent(): void {
-  // create and sdisplay student tile element
+function displayMainContent(): void {
+  // empty page first
+  mainContentEl.innerHTML = "";
+  setStudent();
+
+  // create and display student tile element
   const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
 
-  const tileEl = document.createElement('div');
-  tileEl.classList.add('tile');
-  tileEl.innerHTML = `
-    <div class="tile__img">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>            
-    </div>
+  const tileEl = document.createElement('div');  
+  tileEl.className = "tile";
 
-    <div class="tile__details">
-      <h3>student</h3>
-      <p>cummulative GPA: <b>${studentProfile?.cgpa?.toFixed(2) ?? '0.00' }</b></p>
-      <p>honours: <b>${studentProfile?.honours ?? '---' }</b></p>
-    </div>
+  const tileImgEl = document.createElement('div');
+  const tileIconSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
   `;
+  tileImgEl.className = "tile__img";
+  tileImgEl.innerHTML = tileIconSvg;
+
+  const tileDetailsEl = document.createElement('div');
+  tileDetailsEl.className = "tile__details";
+
+  const tileDetailsTitleEl = document.createElement('h3');
+  tileDetailsTitleEl.innerText = "student";
+
+  const tileCgpaEl = document.createElement('p');
+  const tileCgpaTextEl = document.createElement('b');
+  tileCgpaTextEl.innerText = `${studentProfile.cgpa?.toFixed(2) ?? '0.00'}`
+  tileCgpaEl.innerText = `cummulative GPA: ${tileCgpaTextEl.innerText}`;
+
+  const tileHonsEl = document.createElement('p');
+  const tileHonsTextEl = document.createElement('b');
+  tileHonsTextEl.innerText = `${studentProfile.honours}`
+  tileHonsEl.innerText = `honours: ${tileHonsTextEl.innerText}`;
+
+  tileDetailsEl.append(tileDetailsTitleEl);
+  tileDetailsEl.append(tileCgpaEl);
+  tileDetailsEl.append(tileHonsEl);
+  tileEl.append(tileImgEl);
+  tileEl.append(tileDetailsEl);
+
   mainContentEl.appendChild(tileEl);
 
   // display semester tiles
-  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("grades") || '[]');
+  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
   allSemesters.forEach(semester => displaySemesterInfo(semester))
+};
+
+
+/** delete semester information */
+function deleteSemester(semester: Semester): void {
+  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
+  const selectedSemesterIndex = allSemesters.findIndex(semesterItem => semesterItem.part === semester.part && semesterItem.semester === semester.semester);
+  allSemesters.splice(selectedSemesterIndex, 1);
+  localStorage.setItem("semesters", JSON.stringify(allSemesters));
+  
+  // update page with new content
+  displayMainContent();
+};
+
+
+/** clear all app data */
+function clearApp(): void {
+  localStorage.clear();
+  displayMainContent();
 };

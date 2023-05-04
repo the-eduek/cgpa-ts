@@ -38,8 +38,31 @@
       }
 
       &__details {
+        flex-grow: 1;
+
+        div {
+          align-items: center;
+          display: flex;
+          justify-content: space-between;
+        }
+
         h4 {
           font-weight: 500;
+        }
+      }
+
+      &__btn {
+        .btn {
+          &--close {
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            padding: 0.125rem 0.25rem;
+
+            .btn__icon {
+              width: 1.0125rem;
+              margin: 0 0 0 0.125rem;
+            }
+          }
         }
       }
     }
@@ -124,18 +147,9 @@
 
           &--close {
             border-radius: 100%;
-            color: #ff0000;
             margin: 1rem 0 1rem auto;
             padding: 0.125rem;
-            transform: rotate(45deg);
             width: auto;
-
-            .btn__icon {
-              aspect-ratio: 1 / 1;
-              display: flex;
-              font-size: 1rem;
-              width: 1.5rem;
-            }
           }
         }
 
@@ -153,8 +167,6 @@
               width: 50%;
             }
           }
-    
-          
         }
       }
     }
