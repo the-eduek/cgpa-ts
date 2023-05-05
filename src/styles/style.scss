@@ -59,8 +59,9 @@
             padding: 0.125rem 0.25rem;
 
             .btn__icon {
-              width: 1.0125rem;
               margin: 0 0 0 0.125rem;
+              transform: rotate(45deg);
+              width: 1.0125rem;
             }
           }
         }
@@ -69,24 +70,33 @@
   }
 
   &__footer {
+    display: flex;
     bottom: 0;
     position: fixed;
     width: 100%;
   
     .btn {
+      border-radius: 0;
+      width: 100%;
+
+      .btn__icon {
+        margin: 0 0.5rem 0 0;
+        width: 1.75rem;
+      }
+
       &--cta {
         background-color: #4ad17a;
-        border-radius: 0;
-        width: 100%;
-  
+        color: #343434;
+      }
+      
+      &--clear {
+        background-color: #cf2828;
+        color: #ffffff;
+
         .btn__icon {
-          aspect-ratio: 1 / 1;
-          display: flex;
-          font-size: 1rem;
-          margin: 0 0.5rem 0 0;
-          width: 1.75rem;
+          transform: rotate(45deg);
         }
-      }    
+      }
     }
   }
 
@@ -149,6 +159,7 @@
             border-radius: 100%;
             margin: 1rem 0 1rem auto;
             padding: 0.125rem;
+            transform: rotate(45deg);
             width: auto;
           }
         }
@@ -156,7 +167,7 @@
         .grade {
           display: flex;
           flex-direction: column;
-          margin: 0 0 1rem;
+          margin: 0 0 0.75rem;
           padding: 0.5rem;
           width: 100%;
 
@@ -201,7 +212,8 @@
       @extend %transition;
       background-color: #b8eeee41;
       flex-direction: column;
-      padding: 1rem 0 0;
+      margin: 1rem 0;
+      padding: 0.75rem 0 0;
     }
   }
 

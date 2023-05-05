@@ -36,7 +36,7 @@ function addGradeFormField(): HTMLDivElement {
     fieldInputEl.setAttribute('required', 'true');
     fieldInputEl.dataset[field] = 'true';
 
-    // input yoes depending on field type
+    // input fields depending on field type
     if (field === 'course') fieldInputEl.type = 'text';
     else {
       fieldInputEl.min = '0';
@@ -227,6 +227,9 @@ function displaySemesterInfo(semesterArg: Semester): void {
   // add delete functionality to the clear button;
   tileBtnEl.addEventListener("click", () => {
     deleteSemester(semesterArg);
+
+    // update page with new content
+    displayMainContent();
   });
 
   mainContentEl.appendChild(tileEl);
@@ -254,6 +257,13 @@ semesterBtn.addEventListener("click", toggleVisible);
 // close modal
 modalContentEl.addEventListener("click", (e: Event) => {
   if (e.target === e.currentTarget) toggleVisible();
+});
+
+window.addEventListener("keydown", (e: KeyboardEvent) => {
+  if (e.key.toLowerCase() === 'escape') {
+    const isModalVisible =  modalContentEl.classList.contains('modal--visible');
+    if (isModalVisible) toggleVisible();
+  };
 });
 
 // open/close modal with the close button
@@ -317,19 +327,20 @@ function displayMainContent(): void {
 
 /** delete semester information */
 function deleteSemester(semester: Semester): void {
-  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
+  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters")!);
   const selectedSemesterIndex = allSemesters.findIndex(semesterItem => semesterItem.part === semester.part && semesterItem.semester === semester.semester);
   allSemesters.splice(selectedSemesterIndex, 1);
   localStorage.setItem("semesters", JSON.stringify(allSemesters));
   setStudentDetails();
-  
-  // update page with new content
-  displayMainContent();
 };
 
 
 /** clear all app data */
+const clearBtn = document.querySelector<HTMLButtonElement>("[data-btn-clear]")!;
+
 function clearApp(): void {
   localStorage.clear();
   displayMainContent();
 };
+
+clearBtn.addEventListener("click", clearApp);

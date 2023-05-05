@@ -34,16 +34,14 @@ b {
   padding: 1rem;
   outline-color: #555;
 
+  &__icon {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    width: 1.5rem;
+  }
+
   &--close {
     color: #ff0000;
-
-    .btn__icon {
-      aspect-ratio: 1 / 1;
-      display: flex;
-      font-size: 1rem;
-      width: 1.5rem;
-      transform: rotate(45deg);
-    }
   }
 }
 
