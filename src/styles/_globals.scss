@@ -9,6 +9,13 @@ body {
   font-family: 'Quicksand', serif;
 }
 
+main {
+  background-color: #fff;
+  box-shadow: 2px 2px 5px #ddd, -2px 2px 5px #ddd;
+  margin: 0 auto;
+  max-width: 1024px;
+}
+
 h2,
 h3,
 h4 {
@@ -60,4 +67,10 @@ select {
 .wrap {
   align-items: center;
   display: flex;
+}
+
+@media (min-width: 768px) {
+  :root {
+    font-size: 18px;
+  }
 }
