@@ -6,40 +6,58 @@ import { Grade, Semester } from './classes.js'
 const courseListElement = document.querySelector<HTMLDivElement>("[data-course-list]")!;
 const addGradeBtn = document.querySelector<HTMLButtonElement>("[data-btn-grade]")!;
 
-const gradeHtml: string = `
-  <div class="form-group">
-    <h4 class="form-group__title">course:</h4>
-
-    <div class="wrap wrap--input">
-      <input type="text" data-course required>
-    </div>
-  </div>
-
-  <div class="grade__info">
-    <div class="form-group form-group--one">
-      <h4 class="form-group__title">score:</h4>
-
-      <div class="wrap wrap--input">
-        <input type="number" min="0" max="100" data-score required>
-      </div>
-    </div>
-
-    <div class="form-group form-group--two">
-      <h4 class="form-group__title">units:</h4>
-
-      <div class="wrap wrap--input">
-        <input type="number" min="0" max="20" data-unit required>
-      </div>
-    </div>
-  </div>
-`;
-
 addGradeBtn.addEventListener("click", () => {
-  const gradeEl = document.createElement('div');
-  gradeEl.classList.add('grade');
-  gradeEl.innerHTML = gradeHtml;
-  courseListElement.appendChild(gradeEl);
+  const formField = addGradeFormField();
+  courseListElement.append(formField);
 });
+
+function addGradeFormField(): HTMLDivElement {
+  // each form field has three inputs; course, unit and score.
+  const inputFields = [ 'course', 'score', 'unit' ];
+  const gradeInputEl = document.createElement('div');
+  gradeInputEl.className = 'grade';
+
+  let inputFieldElements: HTMLDivElement[] = [];
+  inputFields.forEach(field => {
+    const fieldGroupEl = document.createElement('div');
+    fieldGroupEl.className = 'form-group';
+    if (field === 'score') fieldGroupEl.classList.add('form-group--one');
+    if (field === 'unit') fieldGroupEl.classList.add('form-group--two');
+
+    const fieldGroupHeaderEl = document.createElement('h4');
+    fieldGroupHeaderEl.className = 'form-group__title';
+    fieldGroupHeaderEl.innerText = `${field}:`;
+
+    const fieldInputWrapEl = document.createElement('div');
+    fieldInputWrapEl.classList.add('wrap');
+    fieldInputWrapEl.classList.add('wrap--input');
+
+    const fieldInputEl = document.createElement('input');
+    fieldInputEl.setAttribute('required', 'true');
+    fieldInputEl.dataset[field] = 'true';
+
+    // input yoes depending on field type
+    if (field === 'course') fieldInputEl.type = 'text';
+    else {
+      fieldInputEl.min = '0';
+      fieldInputEl.max = '100';
+      fieldInputEl.type = 'number';
+    };   
+  
+    fieldInputWrapEl.append(fieldInputEl);
+
+    fieldGroupEl.append(fieldGroupHeaderEl, fieldInputWrapEl);
+
+    inputFieldElements.push(fieldGroupEl);
+  })
+
+  const flexWrapEl = document.createElement('div');
+  flexWrapEl.className = 'grade__info';
+  flexWrapEl.append(inputFieldElements[1], inputFieldElements[2]);
+
+  gradeInputEl.append(inputFieldElements[0], flexWrapEl);
+  return gradeInputEl;
+};
 
 
 /** calculate gpa */
@@ -60,9 +78,9 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
   e.preventDefault();
 
   // get list of all courses, units, scores where the indexes coresponds
-  const coursesList = [...document.querySelectorAll<HTMLInputElement>("[data-course]")].map(input => input.value);
-  const unitsList = [...document.querySelectorAll<HTMLInputElement>("[data-unit]")].map(input => input.valueAsNumber);
-  const scoresList = [...document.querySelectorAll<HTMLInputElement>("[data-score]")].map(input => input.valueAsNumber);
+  const coursesList = [...document.querySelectorAll<HTMLInputElement>("[data-course=true]")].map(input => input.value);
+  const unitsList = [...document.querySelectorAll<HTMLInputElement>("[data-unit=true]")].map(input => input.valueAsNumber);
+  const scoresList = [...document.querySelectorAll<HTMLInputElement>("[data-score=true]")].map(input => input.valueAsNumber);
 
   // check if there's already grade information existing for the same part and semester
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
@@ -78,11 +96,11 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
       let gradeObj = new Grade(...gradeParamsTuple);
       gradesList.push(gradeObj);
     });
-
-    // create semester object
     const totalGradePoints = gradesList.map(grade => grade.gradeTotal);
     const gpa = calculateGPA(totalGradePoints, unitsList);
 
+    
+    // create semester object
     let semesterParamsTuple: [string, 'harmattan' | 'rain', number, Array<Grade>];
     semesterParamsTuple = [partSelect.value, <'harmattan' | 'rain'>semesterSelect.value, gpa, gradesList];
     const semesterObj = new Semester(...semesterParamsTuple);
@@ -141,7 +159,7 @@ function setStudentDetails(): void {
   else if (cgpa > 2.39 && cgpa < 3.5) hons = "second class lower 🤞🏾";
   else if (cgpa > 1.49 && cgpa < 2.4) hons = "third class 😬";
   else if (cgpa > 0.9 && cgpa < 1.5) hons = "pass 🤡";
-  else hons = "no way 💀💀";
+  else hons = "no way 💀";
 
   studentProfile.cgpa = cgpa;
   studentProfile.honours = hons;
@@ -227,7 +245,7 @@ function toggleVisible(): void {
   modalContentEl.classList.toggle('modal--visible');
 
   // reset the course lists 
-  courseListElement.innerHTML = `<div class="grade">${gradeHtml}</div`;
+  courseListElement.innerHTML = addGradeFormField().outerHTML;
 };
 
 // open modal
@@ -246,9 +264,6 @@ closeModalBtn.addEventListener("click", toggleVisible);
 document.addEventListener("DOMContentLoaded", displayMainContent);
 
 function displayMainContent(): void {
-  // empty page first
-  mainContentEl.innerHTML = "";
-
   // create and display student tile element
   let studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student")!);
   
@@ -291,11 +306,12 @@ function displayMainContent(): void {
   tileEl.append(tileImgEl);
   tileEl.append(tileDetailsEl);
 
+  mainContentEl.innerHTML = "";
   mainContentEl.appendChild(tileEl);
 
   // display semester tiles
-  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
-  allSemesters.forEach(semester => displaySemesterInfo(semester))
+  const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters")!);
+  if (allSemesters) allSemesters.forEach(semester => displaySemesterInfo(semester));
 };
 
 
@@ -305,6 +321,7 @@ function deleteSemester(semester: Semester): void {
   const selectedSemesterIndex = allSemesters.findIndex(semesterItem => semesterItem.part === semester.part && semesterItem.semester === semester.semester);
   allSemesters.splice(selectedSemesterIndex, 1);
   localStorage.setItem("semesters", JSON.stringify(allSemesters));
+  setStudentDetails();
   
   // update page with new content
   displayMainContent();
