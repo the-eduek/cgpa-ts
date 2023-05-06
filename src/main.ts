@@ -127,42 +127,49 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 /** get student info, calculate cummulative gpa */
 function setStudentDetails(): void {
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
-  const gradesList = allSemesters.map(semester => semester.grades);
+  const semesterExists = Boolean(allSemesters.length);
 
-  let cummulativeGradePoints: Array<number> = [];
-  let cummulativeUnits: Array<number> = [];
-
-  gradesList.forEach(gradeArray => {
-    let semesterGradesList: Array<Grade> = [];
-
-    gradeArray.forEach(grade => {
-      let gradeParamsTuple: [string, number, number];
-      gradeParamsTuple = [grade.course, grade.unit, grade.score];
-  
-      let gradeObj = new Grade(...gradeParamsTuple);
-      semesterGradesList.push(gradeObj);
-    });
-
-    cummulativeGradePoints.push(...semesterGradesList.map(gr => gr.gradeTotal));
-    cummulativeUnits.push(...semesterGradesList.map(gr => gr.unit));
-  });
-  
-  const cgpa = calculateGPA(cummulativeGradePoints, cummulativeUnits);
-
-  // save cummulative information to local storage  
+  // check for student profile object or create a new object if it doesn't exist
   const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
 
-  let hons: string;
+  if (semesterExists) {
+    const gradesList = allSemesters.map(semester => semester.grades);
 
-  if (cgpa > 4.5) hons = "first class 🏆";
-  else if (cgpa > 3.49 && cgpa < 4.5) hons = "second class upper 💪🏾";
-  else if (cgpa > 2.39 && cgpa < 3.5) hons = "second class lower 🤞🏾";
-  else if (cgpa > 1.49 && cgpa < 2.4) hons = "third class 😬";
-  else if (cgpa > 0.9 && cgpa < 1.5) hons = "pass 🤡";
-  else hons = "no way 💀";
+    let cummulativeGradePoints: Array<number> = [];
+    let cummulativeUnits: Array<number> = [];
 
-  studentProfile.cgpa = cgpa;
-  studentProfile.honours = hons;
+    gradesList.forEach(gradeArray => {
+      let semesterGradesList: Array<Grade> = [];
+
+      gradeArray.forEach(grade => {
+        let gradeParamsTuple: [string, number, number];
+        gradeParamsTuple = [grade.course, grade.unit, grade.score];
+    
+        let gradeObj = new Grade(...gradeParamsTuple);
+        semesterGradesList.push(gradeObj);
+      });
+
+      cummulativeGradePoints.push(...semesterGradesList.map(gr => gr.gradeTotal));
+      cummulativeUnits.push(...semesterGradesList.map(gr => gr.unit));
+    });
+    
+    const cgpa = calculateGPA(cummulativeGradePoints, cummulativeUnits);
+
+    let hons: string;
+    if (cgpa > 4.5) hons = "first class 🏆";
+    else if (cgpa > 3.49 && cgpa < 4.5) hons = "second class upper 💪🏾";
+    else if (cgpa > 2.39 && cgpa < 3.5) hons = "second class lower 🤞🏾";
+    else if (cgpa > 1.49 && cgpa < 2.4) hons = "third class 😬";
+    else if (cgpa > 0.9 && cgpa < 1.5) hons = "pass 🤡";
+    else hons = "no way 💀";
+
+    studentProfile.cgpa = cgpa;
+    studentProfile.honours = hons;
+  } else {
+    studentProfile.cgpa = 0;
+    studentProfile.honours = '——'
+  };
+
   localStorage.setItem("student", JSON.stringify(studentProfile));
 };
 
@@ -302,7 +309,7 @@ function displayMainContent(): void {
 
   const tileCgpaEl = document.createElement('p');
   const tileCgpaTextEl = document.createElement('b');
-  tileCgpaTextEl.innerText = `${studentProfile.cgpa?.toFixed(2) ?? '0.00'}`
+  tileCgpaTextEl.innerText = `${studentProfile.cgpa.toFixed(2)}`
   tileCgpaEl.innerHTML = `cummulative GPA: ${tileCgpaTextEl.outerHTML}`;
 
   const tileHonsEl = document.createElement('p');
