@@ -9,13 +9,6 @@ body {
   font-family: 'Quicksand', serif;
 }
 
-main {
-  background-color: #fff;
-  box-shadow: 2px 2px 5px #ddd, -2px 2px 5px #ddd;
-  margin: 0 auto;
-  max-width: 1024px;
-}
-
 h2,
 h3,
 h4 {
@@ -62,6 +55,10 @@ select {
   outline-color: #555;
   padding: 0.25rem;
   width: 100%;
+
+  &[disabled] {
+    opacity: 0.85;
+  }
 }
 
 .wrap {

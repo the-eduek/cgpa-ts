@@ -1,17 +1,18 @@
 import './styles/style.scss';
-import { Grade, Semester } from './classes.js'
+import { GradeGroup, Grade, Semester } from './classes.js';
 
 
 /** adding a grade field to the form */
 const courseListElement = document.querySelector<HTMLDivElement>("[data-course-list]")!;
 const addGradeBtn = document.querySelector<HTMLButtonElement>("[data-btn-grade]")!;
+const calcGradeBtn = document.querySelector<HTMLButtonElement>("[data-btn-calculate]")!;
 
 addGradeBtn.addEventListener("click", () => {
   const formField = addGradeFormField();
   courseListElement.append(formField);
 });
 
-function addGradeFormField(): HTMLDivElement {
+function addGradeFormField(grade?: GradeGroup): HTMLDivElement {
   // each form field has three inputs; course, unit and score.
   const inputFields = [ 'course', 'score', 'unit' ];
   const gradeInputEl = document.createElement('div');
@@ -33,8 +34,13 @@ function addGradeFormField(): HTMLDivElement {
     fieldInputWrapEl.classList.add('wrap--input');
 
     const fieldInputEl = document.createElement('input');
-    fieldInputEl.setAttribute('required', 'true');
     fieldInputEl.dataset[field] = 'true';
+
+    // set values for input fields if grade object available
+    if (grade) {
+      fieldInputEl.value = <string>grade[field];
+      fieldInputEl.setAttribute('disabled', 'true');
+    } else fieldInputEl.setAttribute('required', 'true');
 
     // input fields depending on field type
     if (field === 'course') fieldInputEl.type = 'text';
@@ -42,20 +48,18 @@ function addGradeFormField(): HTMLDivElement {
       fieldInputEl.min = '0';
       fieldInputEl.max = '100';
       fieldInputEl.type = 'number';
-    };   
-  
+    };
+
     fieldInputWrapEl.append(fieldInputEl);
-
     fieldGroupEl.append(fieldGroupHeaderEl, fieldInputWrapEl);
-
     inputFieldElements.push(fieldGroupEl);
   })
 
   const flexWrapEl = document.createElement('div');
   flexWrapEl.className = 'grade__info';
   flexWrapEl.append(inputFieldElements[1], inputFieldElements[2]);
-
   gradeInputEl.append(inputFieldElements[0], flexWrapEl);
+
   return gradeInputEl;
 };
 
@@ -239,6 +243,13 @@ function displaySemesterInfo(semesterArg: Semester): void {
     displayMainContent();
   });
 
+  // view semester courses and grades functionality
+  tileSemesterEl.addEventListener("click", () => {
+    // open semester grades form modal
+    toggleVisible();
+    openSemesterGrades(semesterArg);
+  });
+
   mainContentEl.appendChild(tileEl);
 };
 
@@ -251,11 +262,23 @@ const modalContentEl = document.querySelector<HTMLDivElement>("[data-modal]")!;
 
 // toggle open/close classe on modal 
 function toggleVisible(): void {
+  // resets
+  partSelect.value = "I";
+  partSelect.removeAttribute("disabled");
+  partSelect.parentElement!.classList.remove('wrap--disabled');
+
+  semesterSelect.value = "harmattan";
+  semesterSelect.removeAttribute("disabled");
+  semesterSelect.parentElement!.classList.remove('wrap--disabled');
+
+  addGradeBtn.removeAttribute("disabled");
+  calcGradeBtn.removeAttribute("disabled");
+  
+  courseListElement.innerHTML = addGradeFormField().outerHTML;
+
+  // close / open modal
   mainEl.classList.toggle('main--blur');
   modalContentEl.classList.toggle('modal--visible');
-
-  // reset the course lists 
-  courseListElement.innerHTML = addGradeFormField().outerHTML;
 };
 
 // open modal
@@ -351,3 +374,28 @@ function clearApp(): void {
 };
 
 clearBtn.addEventListener("click", clearApp);
+
+
+/** view semester courses and grades */
+function openSemesterGrades(semesterObj: Semester): void {
+  // set part and semester values and disable the input values
+  partSelect.value = semesterObj.part;
+  partSelect.setAttribute("disabled", "true");
+  partSelect.parentElement!.classList.add('wrap--disabled');
+
+  semesterSelect.value = semesterObj.semester;
+  semesterSelect.setAttribute("disabled", "true");
+  semesterSelect.parentElement!.classList.add('wrap--disabled');
+  
+  // show all grades avaiable    
+  courseListElement.innerHTML = "";
+
+  semesterObj.grades.forEach(grade => {
+    const gradeElement = addGradeFormField(grade);
+    courseListElement.appendChild(gradeElement);
+  });
+
+  // disable calculate and add grade buttons
+  addGradeBtn.setAttribute("disabled", "true");
+  calcGradeBtn.setAttribute("disabled", "true");
+};

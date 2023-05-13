@@ -8,6 +8,10 @@
 
 .main {
   @extend %transition;
+  background-color: #fff;
+  box-shadow: 2px 2px 5px #ddd, -2px 2px 5px #ddd;
+  margin: 0 auto;
+  max-width: 1024px;
   min-height: 100vh;
   padding: 0 0 4.125rem;
 
@@ -47,7 +51,14 @@
         }
 
         h4 {
+          @extend %transition;
+          cursor: pointer;
           font-weight: 500;
+
+          &:hover {
+            color: rgba(#343434, $alpha: 0.75);
+
+          }
         }
       }
 
@@ -108,7 +119,6 @@
 }
 
 .modal {
-  border: 1px solid red;
   display: flex;
   height: 100%;
   left: 0;
@@ -124,6 +134,7 @@
       border: 1px solid #555;
       border-radius: 0.5rem;
       margin: auto;
+      max-width: 768px;
       padding: 0 1rem 1rem;
       width: 100%;
 
@@ -201,6 +212,12 @@
         top: 50%;
         transform: translateY(-50%) rotate(90deg);
       }
+
+      &.wrap--disabled {
+        &::after {
+          display: none;
+        }
+      }
     }
 
     &--btn {
@@ -223,5 +240,15 @@
     opacity: 1;
     top: -50%;
     transform: translateY(50%);
+  }
+}
+
+@media (min-width: 425px) {
+  .modal {
+    .wrap{
+      &--form {
+        width: 80%;
+      }
+    }
   }
 }

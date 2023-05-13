@@ -1,10 +1,12 @@
-interface GradeObj {
+export interface GradeGroup {
+  readonly [key: string] : string | number;
   course: string;
   unit: number;
   score: number;
 };
 
-export class Grade implements GradeObj {
+export class Grade implements GradeGroup {
+  readonly [key: string] : string | number;
   course: string;
   unit: number;
   score: number;
@@ -15,7 +17,7 @@ export class Grade implements GradeObj {
     this.score = scoreArg;
   };
 
-  get points() {
+  get points(): number {
     let score = this.score;
     let point: number;
 
@@ -29,7 +31,7 @@ export class Grade implements GradeObj {
     return point;
   };
 
-  get gradeTotal() {
+  get gradeTotal(): number {
     return this.points * this.unit;
   };
 };
@@ -38,16 +40,16 @@ export class Semester {
   part: string;
   semester: 'harmattan' | 'rain';
   gpa: number;
-  grades: Array<GradeObj>;
+  grades: Array<GradeGroup>;
 
-  constructor(partArg: string, semesterArg: 'harmattan' | 'rain', gpaArg: number, gradesArg: Array<GradeObj>) {
+  constructor(partArg: string, semesterArg: 'harmattan' | 'rain', gpaArg: number, gradesArg: Array<GradeGroup>) {
     this.part = partArg;
     this.semester = semesterArg;
     this.gpa = gpaArg;
     this.grades = gradesArg;
   };
 
-  get honours() {
+  get honours(): string {
     let gpa = this.gpa;
     let hons: string;
 
