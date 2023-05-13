@@ -115,16 +115,16 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 
     // calculate cummulative gpa and set student object
     setStudentDetails();
+
+    // close the modal
+    toggleVisible();
+
+    // update page with new content
+    displayMainContent();
   } else {
     /** @todo: display some kind of warning on the ui that semester already exists */
-    console.log(`there's already information for part ${partSelect.value}, ${semesterSelect.value} semester.`)
+    window.alert(`there's already information for part ${partSelect.value}, ${semesterSelect.value} semester.`)
   };
-
-  // close the modal
-  toggleVisible();
-
-  // update page with new content
-  displayMainContent();
 });
 
 
