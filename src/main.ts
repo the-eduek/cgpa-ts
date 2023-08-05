@@ -105,8 +105,8 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 
     
     // create semester object
-    let semesterParamsTuple: [string, 'harmattan' | 'rain', number, Array<Grade>];
-    semesterParamsTuple = [partSelect.value, <'harmattan' | 'rain'>semesterSelect.value, gpa, gradesList];
+    let semesterParamsTuple: [string, 'first' | 'second', number, Array<Grade>];
+    semesterParamsTuple = [partSelect.value, <'first' | 'second'>semesterSelect.value, gpa, gradesList];
     const semesterObj = new Semester(...semesterParamsTuple);
 
     // save semester object to local storage
@@ -267,7 +267,7 @@ function toggleVisible(): void {
   partSelect.removeAttribute("disabled");
   partSelect.parentElement!.classList.remove('wrap--disabled');
 
-  semesterSelect.value = "harmattan";
+  semesterSelect.value = "first";
   semesterSelect.removeAttribute("disabled");
   semesterSelect.parentElement!.classList.remove('wrap--disabled');
 

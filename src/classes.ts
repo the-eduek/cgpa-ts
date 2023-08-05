@@ -38,11 +38,11 @@ export class Grade implements GradeGroup {
 
 export class Semester {
   part: string;
-  semester: 'harmattan' | 'rain';
+  semester: 'first' | 'second';
   gpa: number;
   grades: Array<GradeGroup>;
 
-  constructor(partArg: string, semesterArg: 'harmattan' | 'rain', gpaArg: number, gradesArg: Array<GradeGroup>) {
+  constructor(partArg: string, semesterArg: 'first' | 'second', gpaArg: number, gradesArg: Array<GradeGroup>) {
     this.part = partArg;
     this.semester = semesterArg;
     this.gpa = gpaArg;
