@@ -43,6 +43,10 @@ b {
 
   &--close {
     color: #ff0000;
+
+    .btn__icon {
+      transform: rotate(45deg);
+    }
   }
 }
 
@@ -51,17 +55,19 @@ select {
   appearance: none;
   background-color: #fff;
   border: none;
+  color: #343434;
   font-family: inherit;
-  font-size: inherit;
+  font-size: 1rem;
   height: 100%;
   outline-color: #555;
-  padding: 0.25rem;
+  padding: 0.375rem;
   width: 100%;
 
   &[disabled] {
     opacity: 0.85;
   }
 }
+
 
 .wrap {
   align-items: center;

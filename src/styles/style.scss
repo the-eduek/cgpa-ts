@@ -71,7 +71,6 @@
 
             .btn__icon {
               margin: 0 0 0 0.125rem;
-              transform: rotate(45deg);
               width: 1.0125rem;
             }
           }
@@ -152,6 +151,7 @@
           }
     
           &--one {
+            flex-grow: 1;
             margin: 0 0.5rem 0 0;
           }
     
@@ -171,7 +171,6 @@
             border-radius: 100%;
             margin: 1rem 0 1rem auto;
             padding: 0.125rem;
-            transform: rotate(45deg);
             width: auto;
           }
         }
