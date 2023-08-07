@@ -25,6 +25,7 @@ b {
   background-color: #ededed;
   border: none;
   border-radius: 0.375rem;
+  color: #343434;
   cursor: pointer;
   display: flex;
   font-family: 'Cabinet Grotesk', sans-serif;
@@ -48,6 +49,7 @@ b {
 input,
 select {
   appearance: none;
+  background-color: #fff;
   border: none;
   font-family: inherit;
   font-size: inherit;
