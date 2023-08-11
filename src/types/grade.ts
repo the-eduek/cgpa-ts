@@ -1,4 +1,4 @@
-import { GradeGroup } from "..";
+import { GradeGroup } from ".";
 
 export class Grade implements GradeGroup {
   course: string;

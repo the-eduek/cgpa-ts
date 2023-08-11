@@ -1,7 +1,7 @@
-import './styles/style.scss';
+import './styles/index.scss';
 import { GradeGroup, GradeGroupKeys, SemesterType } from './types/index.js';
-import { Semester } from './types/classes/semester';
-import { Grade } from './types/classes/grade';
+import { Semester } from './types/semester.js';
+import { Grade } from './types/grade.js';
 
 
 /** adding a grade field to the form */
