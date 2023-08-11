@@ -1,4 +1,4 @@
-import { GradeGroup, SemesterType } from "../index";
+import { GradeGroup, SemesterType } from "./index.js";
 
 export class Semester {
   part: string;
