@@ -1,13 +1,12 @@
-import { GradeGroup } from "..";
-
+import { GradeGroup, SemesterType } from "../index";
 
 export class Semester {
   part: string;
-  semester: 'first' | 'second';
+  semester: SemesterType;
   gpa: number;
   grades: Array<GradeGroup>;
 
-  constructor(part: string, semester: 'first' | 'second', gpa: number, grades: Array<GradeGroup>) {
+  constructor(part: string, semester: SemesterType, gpa: number, grades: Array<GradeGroup>) {
     this.part = part;
     this.semester = semester;
     this.gpa = gpa;

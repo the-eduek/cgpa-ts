@@ -1,46 +1,46 @@
 import './styles/style.scss';
-import { GradeGroup, GradeGroupKeys } from './types/index.js';
+import { GradeGroup, GradeGroupKeys, SemesterType } from './types/index.js';
 import { Semester } from './types/classes/semester.js';
 import { Grade } from './types/classes/grade.js';
 
 
 /** adding a grade field to the form */
-const courseListElement = document.querySelector<HTMLDivElement>("[data-course-list]")!;
-const addGradeBtn = document.querySelector<HTMLButtonElement>("[data-btn-grade]")!;
-const calcGradeBtn = document.querySelector<HTMLButtonElement>("[data-btn-calculate]")!;
+const courseListElement: HTMLDivElement = document.querySelector("[data-course-list]")!;
+const addGradeBtn: HTMLButtonElement = document.querySelector("[data-btn-grade]")!;
+const calcGradeBtn: HTMLButtonElement = document.querySelector("[data-btn-calculate]")!;
 
 addGradeBtn.addEventListener("click", () => {
-  const formField = addGradeFormField();
+  const formField: HTMLDivElement = renderGradeFormField();
   courseListElement.append(formField);
 });
 
-function addGradeFormField(grade?: GradeGroup): HTMLDivElement {
+function renderGradeFormField(grade?: GradeGroup): HTMLDivElement {
   // each form field has three inputs; course, unit and score.
-  const inputFields = [ 'course', 'score', 'unit' ];
-  const gradeInputEl = document.createElement('div');
+  const inputFields: Array<GradeGroupKeys> = [ 'course', 'score', 'unit' ];  
+  const gradeInputEl: HTMLDivElement = document.createElement('div');
   gradeInputEl.className = 'grade';
 
   let inputFieldElements: HTMLDivElement[] = [];
   inputFields.forEach(field => {
-    const fieldGroupEl = document.createElement('div');
+    const fieldGroupEl: HTMLDivElement = document.createElement('div');
     fieldGroupEl.className = 'form-group';
     if (field === 'score') fieldGroupEl.classList.add('form-group--one');
     if (field === 'unit') fieldGroupEl.classList.add('form-group--two');
 
-    const fieldGroupHeaderEl = document.createElement('h4');
+    const fieldGroupHeaderEl: HTMLHeadingElement = document.createElement('h4');
     fieldGroupHeaderEl.className = 'form-group__title';
     fieldGroupHeaderEl.innerText = `${field}:`;
 
-    const fieldInputWrapEl = document.createElement('div');
+    const fieldInputWrapEl: HTMLDivElement = document.createElement('div');
     fieldInputWrapEl.classList.add('wrap');
     fieldInputWrapEl.classList.add('wrap--input');
 
-    const fieldInputEl = document.createElement('input');
+    const fieldInputEl: HTMLInputElement = document.createElement('input');
     fieldInputEl.dataset[field] = 'true';
 
     // set values for input fields if grade object available
     if (grade) {
-      fieldInputEl.value = <string>grade[field];
+      fieldInputEl.value = `${grade[field]}`;
       fieldInputEl.setAttribute('disabled', 'true');
     } else fieldInputEl.setAttribute('required', 'true');
 
@@ -67,15 +67,15 @@ function addGradeFormField(grade?: GradeGroup): HTMLDivElement {
 
 
 /** calculate gpa */
-const gradeForm = document.querySelector<HTMLFormElement>("[data-grade-form]")!;
-const partSelect = document.querySelector<HTMLSelectElement>("[data-part]")!;
-const semesterSelect = document.querySelector<HTMLSelectElement>("[data-semester]")!;
+const gradeForm: HTMLFormElement = document.querySelector("[data-grade-form]")!;
+const partSelect: HTMLSelectElement = document.querySelector("[data-part]")!;
+const semesterSelect: HTMLSelectElement = document.querySelector("[data-semester]")!;
 
 function calculateGPA(gradePoints: Array<number>, allUnits: Array<number>): number {
-    // add grade points and divide by total no of units
-  const totalGradePoints = gradePoints.reduce((a, b) => a + b, 0);
-  const totalUnits = allUnits.reduce((a, b) => a + b, 0);
-  const gpa = totalGradePoints / totalUnits;
+  // add grade points and divide by total no of units
+  const totalGradePoints: number = gradePoints.reduce((a, b) => a + b, 0);
+  const totalUnits: number = allUnits.reduce((a, b) => a + b, 0);
+  const gpa: number = totalGradePoints / totalUnits;
 
   return Number(gpa.toFixed(2));
 };
@@ -84,32 +84,37 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
   e.preventDefault();
 
   // get list of all courses, units, scores where the indexes coresponds
-  const coursesList = [...document.querySelectorAll<HTMLInputElement>("[data-course=true]")].map(input => input.value);
-  const unitsList = [...document.querySelectorAll<HTMLInputElement>("[data-unit=true]")].map(input => input.valueAsNumber);
-  const scoresList = [...document.querySelectorAll<HTMLInputElement>("[data-score=true]")].map(input => input.valueAsNumber);
+  const coursesList: Array<string> = [...document.querySelectorAll<HTMLInputElement>("[data-course=true]")].map(input => input.value);
+  const unitsList: Array<number> = [...document.querySelectorAll<HTMLInputElement>("[data-unit=true]")].map(input => input.valueAsNumber);
+  const scoresList: Array<number> = [...document.querySelectorAll<HTMLInputElement>("[data-score=true]")].map(input => input.valueAsNumber);
 
   // check if there's already grade information existing for the same part and semester
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
-  const semesterAlreadyExists = allSemesters.some(semesterItem => semesterItem.part === partSelect.value && semesterItem.semester === semesterSelect.value);
+  const semesterAlreadyExists: boolean = allSemesters.some(semesterItem => semesterItem.part === partSelect.value && semesterItem.semester === semesterSelect.value);
 
   if (!semesterAlreadyExists) {
     // calculate gpa
     const gradesList: Array<Grade> = [];
     coursesList.forEach((course, index) => {
-      let gradeParamsTuple: [string, number, number];
-      gradeParamsTuple = [course.toLowerCase(), unitsList[index], scoresList[index]];
-
-      let gradeObj = new Grade(...gradeParamsTuple);
+      let gradeObj : Grade = new Grade(
+        course.toLowerCase(),
+        unitsList[index],
+        scoresList[index]
+      );
       gradesList.push(gradeObj);
     });
-    const totalGradePoints = gradesList.map(grade => grade.gradeTotal);
-    const gpa = calculateGPA(totalGradePoints, unitsList);
+    const totalGradePoints: Array<number> = gradesList.map(grade => grade.gradeTotal);
+    const gpa: number = calculateGPA(totalGradePoints, unitsList);
 
-    
     // create semester object
-    let semesterParamsTuple: [string, 'first' | 'second', number, Array<Grade>];
-    semesterParamsTuple = [partSelect.value, <'first' | 'second'>semesterSelect.value, gpa, gradesList];
-    const semesterObj = new Semester(...semesterParamsTuple);
+    const sem : SemesterType = Number(semesterSelect.value);
+
+    const semesterObj: Semester = new Semester(
+      partSelect.value,
+      sem,
+      gpa,
+      gradesList
+    );
 
     // save semester object to local storage
     allSemesters.push(semesterObj);
@@ -133,7 +138,7 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 /** get student info, calculate cummulative gpa */
 function setStudentDetails(): void {
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
-  const semesterExists = Boolean(allSemesters.length);
+  const semesterExists : boolean = Boolean(allSemesters.length);
 
   // check for student profile object or create a new object if it doesn't exist
   const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
@@ -147,11 +152,12 @@ function setStudentDetails(): void {
     gradesList.forEach(gradeArray => {
       let semesterGradesList: Array<Grade> = [];
 
-      gradeArray.forEach(grade => {
-        let gradeParamsTuple: [string, number, number];
-        gradeParamsTuple = [grade.course, grade.unit, grade.score];
-    
-        let gradeObj = new Grade(...gradeParamsTuple);
+      gradeArray.forEach(grade => {    
+        let gradeObj = new Grade(
+          grade.course,
+          grade.unit,
+          grade.score
+        );
         semesterGradesList.push(gradeObj);
       });
 
@@ -185,10 +191,10 @@ const mainContentEl = document.querySelector<HTMLDivElement>('[data-main-content
 
 function displaySemesterInfo(semesterArg: Semester): void {
   // create and display tile element
-  const tileEl = document.createElement('div');  
+  const tileEl: HTMLDivElement = document.createElement('div');  
   tileEl.className = "tile";
 
-  const tileImgEl = document.createElement('div');
+  const tileImgEl: HTMLDivElement = document.createElement('div');
   const tileIconSvg = `
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
     <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
@@ -200,22 +206,22 @@ function displaySemesterInfo(semesterArg: Semester): void {
   tileImgEl.className = "tile__img";
   tileImgEl.innerHTML = tileIconSvg;
 
-  const tileDetailsEl = document.createElement('div');
+  const tileDetailsEl: HTMLDivElement = document.createElement('div');
   tileDetailsEl.className = "tile__details";
-  const tileDetailsWrapEl = document.createElement('div');
+  const tileDetailsWrapEl: HTMLDivElement = document.createElement('div');
  
-  const tileBtnWrapEl = document.createElement('div');
+  const tileBtnWrapEl: HTMLDivElement = document.createElement('div');
   tileBtnWrapEl.className = "tile__btn";
 
-  const tileBtnEl = document.createElement('button');
+  const tileBtnEl: HTMLButtonElement = document.createElement('button');
   tileBtnEl.classList.add("btn");
   tileBtnEl.classList.add("btn--close");
   tileBtnEl.type = "button";
 
-  const tileBtnTextEl = document.createElement('span');
+  const tileBtnTextEl: HTMLSpanElement = document.createElement('span');
   tileBtnTextEl.innerText = "delete";
 
-  const tileBtnIconEl = document.createElement('span');
+  const tileBtnIconEl: HTMLSpanElement = document.createElement('span');
   const tileBtnIconSvg = `
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h8m-4-4v8m9-4a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
@@ -224,10 +230,10 @@ function displaySemesterInfo(semesterArg: Semester): void {
   tileBtnIconEl.className = "btn__icon";
   tileBtnIconEl.innerHTML = tileBtnIconSvg;
 
-  const tileSemesterEl = document.createElement('h4');
+  const tileSemesterEl: HTMLHeadingElement = document.createElement('h4');
   tileSemesterEl.innerText = `part ${semesterArg.part.toUpperCase()}, ${semesterArg.semester} semester`;
 
-  const tileGpaEl = document.createElement('p');
+  const tileGpaEl: HTMLParagraphElement = document.createElement('p');
   tileGpaEl.innerText = `GPA: ${semesterArg.gpa.toFixed(2)}`;
 
   tileBtnEl.append(tileBtnTextEl);
@@ -260,10 +266,10 @@ function displaySemesterInfo(semesterArg: Semester): void {
 
 
 /** opening and closing the semester grades form */
-const semesterBtn = document.querySelector<HTMLButtonElement>("[data-btn-semester]")!;
-const closeModalBtn = document.querySelector<HTMLButtonElement>("[data-btn-close]")!;
-const mainEl = document.querySelector<HTMLDivElement>("[data-main]")!;
-const modalContentEl = document.querySelector<HTMLDivElement>("[data-modal]")!;
+const semesterBtn: HTMLButtonElement = document.querySelector("[data-btn-semester]")!;
+const closeModalBtn: HTMLButtonElement = document.querySelector("[data-btn-close]")!;
+const mainEl: HTMLDivElement = document.querySelector("[data-main]")!;
+const modalContentEl: HTMLDivElement = document.querySelector("[data-modal]")!;
 
 // toggle open/close classe on modal 
 function toggleVisible(): void {
@@ -279,7 +285,7 @@ function toggleVisible(): void {
   addGradeBtn.removeAttribute("disabled");
   calcGradeBtn.removeAttribute("disabled");
   
-  courseListElement.innerHTML = addGradeFormField().outerHTML;
+  courseListElement.innerHTML = renderGradeFormField().outerHTML;
 
   // close / open modal
   mainEl.classList.toggle('main--blur');
@@ -296,7 +302,7 @@ modalContentEl.addEventListener("click", (e: Event) => {
 
 window.addEventListener("keydown", (e: KeyboardEvent) => {
   if (e.key.toLowerCase() === 'escape') {
-    const isModalVisible =  modalContentEl.classList.contains('modal--visible');
+    const isModalVisible: boolean =  modalContentEl.classList.contains('modal--visible');
     if (isModalVisible) toggleVisible();
   };
 });
@@ -317,10 +323,10 @@ function displayMainContent(): void {
     studentProfile = JSON.parse(localStorage.getItem("student")!);
   };
 
-  const tileEl = document.createElement('div');  
+  const tileEl: HTMLDivElement = document.createElement('div');  
   tileEl.className = "tile";
 
-  const tileImgEl = document.createElement('div');
+  const tileImgEl: HTMLDivElement = document.createElement('div');
   const tileIconSvg = `
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
       <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
@@ -333,19 +339,19 @@ function displayMainContent(): void {
   tileImgEl.className = "tile__img";
   tileImgEl.innerHTML = tileIconSvg;
 
-  const tileDetailsEl = document.createElement('div');
+  const tileDetailsEl: HTMLDivElement = document.createElement('div');
   tileDetailsEl.className = "tile__details";
 
-  const tileDetailsTitleEl = document.createElement('h3');
+  const tileDetailsTitleEl: HTMLHeadingElement = document.createElement('h3');
   tileDetailsTitleEl.innerText = "student";
 
-  const tileCgpaEl = document.createElement('p');
-  const tileCgpaTextEl = document.createElement('b');
+  const tileCgpaEl: HTMLParagraphElement = document.createElement('p');
+  const tileCgpaTextEl: HTMLElement = document.createElement('b');
   tileCgpaTextEl.innerText = `${studentProfile.cgpa.toFixed(2)}`
   tileCgpaEl.innerHTML = `cummulative GPA: ${tileCgpaTextEl.outerHTML}`;
 
-  const tileHonsEl = document.createElement('p');
-  const tileHonsTextEl = document.createElement('b');
+  const tileHonsEl: HTMLParagraphElement = document.createElement('p');
+  const tileHonsTextEl: HTMLElement = document.createElement('b');
   tileHonsTextEl.innerText = `${studentProfile.honours}`
   tileHonsEl.innerHTML = `honours: ${tileHonsTextEl.outerHTML}`;
 
@@ -360,14 +366,23 @@ function displayMainContent(): void {
 
   // display semester tiles
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters")!);
-  if (allSemesters) allSemesters.forEach(semester => displaySemesterInfo(semester));
+  if (allSemesters) allSemesters.forEach(localSemester => {
+    const semesterObj = new Semester(
+      localSemester.part,
+      localSemester.semester,
+      localSemester.gpa,
+      localSemester.grades
+    );
+
+    displaySemesterInfo(semesterObj);
+  });
 };
 
 
 /** delete semester information */
 function deleteSemester(semester: Semester): void {
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters")!);
-  const selectedSemesterIndex = allSemesters.findIndex(semesterItem => semesterItem.part === semester.part && semesterItem.semester === semester.semester);
+  const selectedSemesterIndex: number = allSemesters.findIndex(semesterItem => semesterItem.part === semester.part && semesterItem.semester === semester.semester);
   allSemesters.splice(selectedSemesterIndex, 1);
   localStorage.setItem("semesters", JSON.stringify(allSemesters));
   setStudentDetails();
@@ -375,7 +390,7 @@ function deleteSemester(semester: Semester): void {
 
 
 /** clear all app data */
-const clearBtn = document.querySelector<HTMLButtonElement>("[data-btn-clear]")!;
+const clearBtn: HTMLButtonElement = document.querySelector("[data-btn-clear]")!;
 
 function clearApp(): void {
   localStorage.clear();
@@ -392,7 +407,7 @@ function openSemesterGrades(semesterObj: Semester): void {
   partSelect.setAttribute("disabled", "true");
   partSelect.parentElement!.classList.add('wrap--disabled');
 
-  semesterSelect.value = semesterObj.semester;
+  semesterSelect.value = `${semesterObj.semester}`;
   semesterSelect.setAttribute("disabled", "true");
   semesterSelect.parentElement!.classList.add('wrap--disabled');
   
@@ -400,7 +415,7 @@ function openSemesterGrades(semesterObj: Semester): void {
   courseListElement.innerHTML = "";
 
   semesterObj.grades.forEach(grade => {
-    const gradeElement = addGradeFormField(grade);
+    const gradeElement: HTMLDivElement = renderGradeFormField(grade);
     courseListElement.appendChild(gradeElement);
   });
 

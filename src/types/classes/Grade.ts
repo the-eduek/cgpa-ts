@@ -1,7 +1,6 @@
 import { GradeGroup } from "..";
 
 export class Grade implements GradeGroup {
-  readonly [key: string] : string | number;
   course: string;
   unit: number;
   score: number;
