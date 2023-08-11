@@ -1,4 +1,3 @@
-import './styles/index.scss';
 import { GradeGroup, GradeGroupKeys, SemesterType } from './types/index.js';
 import { Semester } from './types/semester.js';
 import { Grade } from './types/grade.js';
@@ -187,7 +186,7 @@ function setStudentDetails(): void {
 /** displaying semester tiles  */
 const mainContentEl = document.querySelector<HTMLDivElement>('[data-main-content]')!;
 
-function displaySemesterInfo(semesterArg: Semester): void {
+function renderSemesterInfo(semesterArg: Semester): void {
   // create and display tile element
   const tileEl: HTMLDivElement = document.createElement('div');  
   tileEl.className = "tile";
@@ -341,7 +340,7 @@ function displayMainContent(): void {
   tileDetailsEl.className = "tile__details";
 
   const tileDetailsTitleEl: HTMLHeadingElement = document.createElement('h3');
-  tileDetailsTitleEl.innerText = "student";
+  tileDetailsTitleEl.innerText = "student details";
 
   const tileCgpaEl: HTMLParagraphElement = document.createElement('p');
   const tileCgpaTextEl: HTMLElement = document.createElement('b');
@@ -372,7 +371,7 @@ function displayMainContent(): void {
       localSemester.grades
     );
 
-    displaySemesterInfo(semesterObj);
+    renderSemesterInfo(semesterObj);
   });
 };
 
