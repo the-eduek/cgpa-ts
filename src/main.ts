@@ -90,7 +90,7 @@ gradeForm.addEventListener("submit", (e: SubmitEvent) => {
 
   // check if there's already grade information existing for the same part and semester
   const allSemesters: Array<Semester> = JSON.parse(localStorage.getItem("semesters") || '[]');
-  const semesterAlreadyExists: boolean = allSemesters.some(semesterItem => semesterItem.part === partSelect.value && semesterItem.semester === semesterSelect.value);
+  const semesterAlreadyExists: boolean = allSemesters.some(semesterItem => semesterItem.part === partSelect.value && `${semesterItem.semester.toString}` === semesterSelect.value);
 
   if (!semesterAlreadyExists) {
     // calculate gpa
