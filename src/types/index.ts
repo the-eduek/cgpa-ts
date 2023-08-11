@@ -7,6 +7,6 @@ export interface GradeGroup {
 export type GradeGroupKeys = keyof GradeGroup;
 
 export enum SemesterType {
-  'first',
-  'second'
+  'first' = 'first',
+  'second' = 'second'
 }
