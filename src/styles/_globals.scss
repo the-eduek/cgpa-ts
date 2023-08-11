@@ -39,6 +39,11 @@ b {
     aspect-ratio: 1 / 1;
     display: flex;
     width: 1.5rem;
+
+    svg {
+      height: 100%;
+      width: 100%;
+    }
   }
 
   &--close {
