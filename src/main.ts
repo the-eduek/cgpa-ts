@@ -144,7 +144,7 @@ function setStudentDetails(): void {
   const studentProfile: { cgpa: number, honours: string } = JSON.parse(localStorage.getItem("student") || '{}');
 
   if (semesterExists) {
-    const gradesList = allSemesters.map(semester => semester.grades);
+    const gradesList: Array<Array<GradeGroup>> = allSemesters.map(semester => semester.grades);
 
     let cummulativeGradePoints: Array<number> = [];
     let cummulativeUnits: Array<number> = [];
@@ -152,7 +152,7 @@ function setStudentDetails(): void {
     gradesList.forEach(gradeArray => {
       let semesterGradesList: Array<Grade> = [];
 
-      gradeArray.forEach(grade => {    
+      gradeArray.forEach((grade: GradeGroup) => {    
         let gradeObj = new Grade(
           grade.course,
           grade.unit,
